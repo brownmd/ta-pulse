@@ -1,0 +1,39 @@
+<!-- 
+  ta-pulse — Listmonk campaign email template
+  Personalized survey link passes subscriber email and name 
+  to Formbricks via URL parameters (captured as hidden fields).
+
+  Listmonk template variables:
+    {{ .Subscriber.FirstName }} — subscriber first name
+    {{ .Subscriber.Email }}     — subscriber email
+    {{ .Subscriber.Name }}      — subscriber full name
+
+  Before using:
+    1. Add hidden fields "email" and "name" in your Formbricks survey settings
+    2. Replace YOUR_SURVEY_ID with your Formbricks survey ID
+-->
+
+<p>Hi {{ .Subscriber.FirstName }},</p>
+
+<p>Quick note — the survey link I sent earlier was broken (expired free tier, my bad). Here's the working link. It takes 1-3 minutes and closes this Friday.</p>
+
+<p style="text-align:center; padding:24px 0;">
+  <a href="https://survey.yourdomain.com/s/YOUR_SURVEY_ID?email={{ .Subscriber.Email }}&name={{ .Subscriber.Name }}"
+     style="background:#000000; color:#ffffff; padding:14px 28px; text-decoration:none; border-radius:6px; font-size:16px; display:inline-block;">
+    Take the Survey
+  </a>
+</p>
+
+<p style="text-align:center; font-size:14px; color:#555; margin-top:-12px;">
+  10 questions only (1-3 min)
+</p>
+
+<p>I'll share the full results and analysis on 
+  <a href="https://yourdomain.com" style="color:#000000;"><strong>The Talent Operator</strong></a> 
+  once everything is compiled. The more voices we include, the stronger and more representative the insights will be.
+</p>
+
+<p>Best,<br>
+David Brown<br>
+<a href="https://www.linkedin.com/in/davidbrownm">LinkedIn</a> | talentoperatorOS.io
+</p>

@@ -1,0 +1,107 @@
+# ta-pulse — Formbricks self-hosted survey stack
+# Replace all YOUR_* placeholders before running
+#
+# Prerequisites:
+#   - Docker + docker-compose installed
+#   - DNS records pointing to your server:
+#       survey.yourdomain.com  → your server IP
+#       files.yourdomain.com   → your server IP
+#   - Nginx + Certbot configured for both subdomains
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: formbricks-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: formbricks
+      POSTGRES_PASSWORD: YOUR_DB_PASSWORD
+      POSTGRES_DB: formbricks
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U formbricks"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: valkey/valkey
+    container_name: formbricks-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio
+    container_name: formbricks-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: YOUR_MINIO_ACCESS_KEY
+      MINIO_ROOT_PASSWORD: YOUR_MINIO_SECRET_KEY
+    volumes:
+      - ./minio-data:/data
+    ports:
+      - "127.0.0.1:9100:9000"
+      - "127.0.0.1:9101:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio-setup:
+    image: minio/mc
+    container_name: formbricks-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://formbricks-minio:9000 YOUR_MINIO_ACCESS_KEY YOUR_MINIO_SECRET_KEY;
+      mc mb --ignore-existing local/formbricks-uploads;
+      mc anonymous set download local/formbricks-uploads/uploads/public;
+      exit 0;
+      "
+
+  formbricks:
+    image: ghcr.io/formbricks/formbricks:latest
+    container_name: formbricks
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      WEBAPP_URL: https://survey.yourdomain.com
+      NEXTAUTH_URL: https://survey.yourdomain.com
+      DATABASE_URL: postgresql://formbricks:YOUR_DB_PASSWORD@formbricks-db:5432/formbricks
+      REDIS_URL: redis://formbricks-redis:6379
+      NEXTAUTH_SECRET: YOUR_NEXTAUTH_SECRET        # openssl rand -base64 32
+      ENCRYPTION_KEY: YOUR_ENCRYPTION_KEY          # openssl rand -hex 32
+      CRON_SECRET: YOUR_CRON_SECRET                # openssl rand -base64 32
+      EMAIL_VERIFICATION_DISABLED: "1"
+      MAIL_FROM: hello@yourdomain.com
+      SMTP_HOST: email-smtp.us-east-1.amazonaws.com
+      SMTP_PORT: "587"
+      SMTP_USER: YOUR_SES_SMTP_USERNAME
+      SMTP_PASSWORD: YOUR_SES_SMTP_PASSWORD
+      SMTP_SECURE_ENABLED: "1"
+      S3_ACCESS_KEY: YOUR_MINIO_ACCESS_KEY
+      S3_SECRET_KEY: YOUR_MINIO_SECRET_KEY
+      S3_REGION: us-east-1
+      S3_BUCKET_NAME: formbricks-uploads
+      S3_ENDPOINT_URL: https://files.yourdomain.com
+      S3_FORCE_PATH_STYLE: "1"
+    volumes:
+      - ./uploads:/home/nextjs/apps/web/uploads/
