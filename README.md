@@ -28,7 +28,7 @@ no prior DevOps or server administration experience required.
 ## How it works
 
 1. Survey built and published in Formbricks
-2. Contact list sourced via LinkedIn and Apollo
+2. Contact list sourced via LinkedIn and SaleSQL
 3. Subscribers managed in Listmonk
 4. Personalized survey link delivered per subscriber via email
 5. Responses captured and analyzed
