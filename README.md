@@ -10,7 +10,7 @@ similar tools. Built the entire stack on a single Linux server using
 open source software.
 
 Contact list sourced from 1st connections on LinkedIn, with 2nd and 
-3rd connections enriched via Apollo.
+3rd connections enriched via SaleSQL.
 
 ## How it was built
 
