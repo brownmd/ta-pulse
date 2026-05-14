@@ -1,21 +1,10 @@
-# ta-pulse
+# Email Distribution & Survey System
 
-A self hosted survey and email distribution stack built for 
-Talent Acquisition research, no SaaS subscriptions, no per-seat pricing.
-
-## Background
-
-Wanted to run a TA research survey without paying for Qualtrics or 
-similar tools. Built the entire stack on a single Linux server using 
-open source software.
-
-Contact list sourced from 1st connections on LinkedIn, with 2nd and 
-3rd connections enriched via SaleSQL.
+Created a distribution email system and a survey system to reduce spend and have maximum control of the software that I rely upon.
 
 ## How it was built
 
-Entirely through conversational prompting with Claude Code, 
-no prior DevOps or server administration experience required.
+Entirely through conversational prompting with Claude Code and Github Copilot.
 
 ## Stack
 
